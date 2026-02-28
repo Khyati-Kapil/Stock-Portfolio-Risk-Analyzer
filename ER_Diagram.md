@@ -1,4 +1,4 @@
-# Stock Portfolio Risk Analyzer ER Diagram (Revised)
+# Stock Portfolio Risk Analyzer ER Diagram 
 
 ```mermaid
 erDiagram
