@@ -1,4 +1,4 @@
-# NSE Portfolio Risk Analyzer
+# NSE/BSE Portfolio Risk Analyzer
 
 > A beginner-friendly, React-powered dashboard that brings professional portfolio risk metrics, trend signals, and statistical simulations into one unified tool for Indian retail investors.
 
