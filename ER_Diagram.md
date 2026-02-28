@@ -120,11 +120,3 @@ erDiagram
     STRESS_SCENARIOS ||--o{ STRESS_RESULTS : defines
 ```
 
-## Notes
-- Prefer calculating holdings from `TRANSACTIONS`; `HOLDINGS_SNAPSHOT` is for fast reads/reporting.
-- Enforce unique keys:
-  - `USERS.email`
-  - `ASSETS.ticker`
-  - `PRICE_HISTORY(asset_id, price_date)`
-  - `BENCHMARK_RETURNS(benchmark_id, return_date)`
-- Store one `RISK_METRICS` row per `RISK_RUNS` row.
