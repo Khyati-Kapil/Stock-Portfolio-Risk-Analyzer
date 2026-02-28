@@ -1,0 +1,281 @@
+:root {
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --ink: #0f172a;
+  --muted: #475569;
+  --line: #dbe2ea;
+  --primary: #0b3b66;
+  --accent: #1f7a8c;
+  --danger: #b91c1c;
+  --ok: #0f766e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, #d9e4f3 0%, transparent 40%),
+    radial-gradient(circle at bottom right, #d7efe7 0%, transparent 35%),
+    var(--bg);
+}
+
+.app-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.hero {
+  background: linear-gradient(125deg, #082f49, #0b3b66 45%, #1f7a8c);
+  color: #f8fafc;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+}
+
+.hero p {
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 1.15rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pill {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.pill-ok {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.pill-warn {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.holding-list {
+  display: grid;
+  gap: 8px;
+}
+
+.holding-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr auto;
+  gap: 8px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+input,
+select,
+button {
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  padding: 9px 10px;
+  font: inherit;
+}
+
+.btn {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: #0a3155;
+}
+
+.btn-ghost {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.row-actions,
+.cta-row {
+  margin-top: 10px;
+}
+
+.status {
+  margin: 10px 0 0;
+  font-weight: 600;
+}
+
+.status-ok {
+  color: var(--ok);
+}
+
+.status-error {
+  color: var(--danger);
+}
+
+.metrics-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.metric-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.metric-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0b3b66;
+}
+
+.matrix-wrap {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 460px;
+}
+
+.matrix-table th,
+.matrix-table td {
+  border: 1px solid var(--line);
+  text-align: center;
+  padding: 8px;
+}
+
+pre {
+  margin: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 700px) {
+  .hero h1 {
+    font-size: 1.55rem;
+  }
+
+  .holding-row {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.insight-summary {
+  margin: 0 0 12px;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.insight-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: #f8fbff;
+}
+
+.insight-card h4 {
+  margin: 0 0 6px;
+  color: #0b3b66;
+}
+
+.insight-card p {
+  margin: 0;
+  color: #1f2937;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.insight-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.insight-list li {
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
