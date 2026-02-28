@@ -1,1 +1,4 @@
 .env
+venv2/
+frontend/node_modules/
+backend.log
