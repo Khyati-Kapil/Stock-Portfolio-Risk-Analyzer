@@ -1,1 +1,0 @@
-# RSI, MACD, Moving Averages
