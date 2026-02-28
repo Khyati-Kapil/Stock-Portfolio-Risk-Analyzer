@@ -3,7 +3,6 @@ import React from 'react';
 function NewsFeed({ tickers }) {
     if (!tickers || tickers.length === 0) return null;
 
-    // Fake news generator for the premium feel
     const newsItems = tickers.slice(0, 3).map((ticker, idx) => ({
         id: idx,
         title: `${ticker.replace('.NS', '')} releases unexpected earnings preview`,

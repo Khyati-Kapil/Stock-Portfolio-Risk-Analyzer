@@ -3,7 +3,6 @@ import React from 'react';
 function TrendSignalPanel({ metrics }) {
     if (!metrics) return null;
 
-    // Derive a basic signal from beta and sharpe to look smart
     let recommendation = "HOLD";
     let colorClass = "badge-warning";
 

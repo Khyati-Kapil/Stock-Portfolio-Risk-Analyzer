@@ -7,3 +7,6 @@ pydantic
 requests
 pytest
 httpx
+python-multipart
+openai
+python-dotenv

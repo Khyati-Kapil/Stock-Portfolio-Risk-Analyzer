@@ -6,7 +6,7 @@ import CorrelationMatrix from './components/CorrelationMatrix';
 import TrendSignalPanel from './components/TrendSignalPanel';
 import NewsFeed from './components/NewsFeed';
 import MonteCarloPaths from './components/MonteCarloPaths';
-import { analyzePortfolio } from './api/riskService';
+import { analyzePortfolio } from './api/riskApi';
 
 function App() {
   const [holdings, setHoldings] = useState([]);
@@ -15,14 +15,13 @@ function App() {
   const [error, setError] = useState(null);
 
   const handleHoldingsUpdate = (parsedHoldings) => {
-    // Expected parsedHoldings: { tickers: [...], weights: [...] }
     if (parsedHoldings && parsedHoldings.tickers && parsedHoldings.weights) {
       const combined = parsedHoldings.tickers.map((ticker, i) => ({
         ticker: ticker,
         weight: parsedHoldings.weights[i]
       }));
       setHoldings(combined);
-      setMetricsData(null); // clear old data when a new screenshot is loaded
+      setMetricsData(null);
     }
   };
 
@@ -72,10 +71,8 @@ function App() {
 
           {error && <div className="error-text">{error}</div>}
 
-          {/* Render Signal Panel conditionally on the left column */}
           {metricsData && <TrendSignalPanel metrics={metricsData.metrics} />}
 
-          {/* NewsFeed at the bottom of the left column */}
           {holdings.length > 0 && <NewsFeed tickers={holdings.map(h => h.ticker)} />}
         </aside>
 

@@ -1,30 +1,49 @@
 from __future__ import annotations
 
+import os
+import tempfile
+from pathlib import Path
 from typing import List
 
-import os
-import shutil
-from fastapi import FastAPI, HTTPException, UploadFile, File
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.data.fetcher import fetch_price_history, fetch_single_price_series
 from backend.data.preprocessor import build_portfolio_returns, compute_returns, normalize_weights
-# Load .env file manually if python-dotenv is not installed
-env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
-if os.path.exists(env_path):
-    with open(env_path, "r") as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith("#"):
-                key, val = line.split("=", 1)
-                os.environ[key.strip()] = val.strip()
-
+from backend.data.scraper import extract_text_from_image, parse_ocr_text_to_portfolio
 from backend.risk.beta import beta_alpha
 from backend.risk.correlation import correlation_matrix
 from backend.risk.sharpe import sharpe_ratio
 from backend.risk.var import historical_var, monte_carlo_var, parametric_var_cvar
-from backend.data.scraper import extract_text_from_image, parse_ocr_text_to_portfolio
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+if load_dotenv is not None:
+    load_dotenv(BASE_DIR / ".env")
+
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(5 * 1024 * 1024)))
+ALLOWED_UPLOAD_MIME_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+}
+
+
+def _cors_origins() -> List[str]:
+    configured = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
+    if configured:
+        return [origin.strip() for origin in configured.split(",") if origin.strip()]
+
+    return [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
 
 
 class Holding(BaseModel):
@@ -48,7 +67,7 @@ app = FastAPI(title="Stock Portfolio Risk Analyzer API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,32 +80,42 @@ def health() -> dict:
 
 
 @app.post("/api/upload")
-async def upload_image(file: UploadFile = File(...)):
-    # Ensure temp directory exists
-    os.makedirs("temp", exist_ok=True)
-    path = f"temp/{file.filename}"
-    
+async def upload_image(file: UploadFile = File(...)) -> dict:
+    content_type = (file.content_type or "").lower().strip()
+    if content_type not in ALLOWED_UPLOAD_MIME_TYPES:
+        raise HTTPException(status_code=415, detail="Unsupported file type. Use JPEG, PNG, or WEBP.")
+
+    path: str | None = None
+    bytes_written = 0
+
     try:
-        with open(path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-            
-        # 1. Extract raw text from image
-        ocr_text = extract_text_from_image(path)
-        
-        # 2. Parse text into structured portfolio JSON using LLM
+        suffix = ALLOWED_UPLOAD_MIME_TYPES[content_type]
+        with tempfile.NamedTemporaryFile("wb", suffix=suffix, delete=False) as tmp:
+            path = tmp.name
+            while True:
+                chunk = await file.read(1024 * 1024)
+                if not chunk:
+                    break
+                bytes_written += len(chunk)
+                if bytes_written > MAX_UPLOAD_BYTES:
+                    raise HTTPException(status_code=413, detail="Image too large.")
+                tmp.write(chunk)
+
+        ocr_text = extract_text_from_image(path, mime_type=content_type)
         portfolio_data = parse_ocr_text_to_portfolio(ocr_text)
-        
         return portfolio_data
-        
+
+    except HTTPException:
+        raise
     except ImportError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
     except ValueError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Failed to process image: {str(exc)}")
+        raise HTTPException(status_code=400, detail=f"Failed to process image: {str(exc)}") from exc
     finally:
-        # Clean up temp file
-        if os.path.exists(path):
+        await file.close()
+        if path and os.path.exists(path):
             os.remove(path)
 
 

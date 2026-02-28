@@ -9,9 +9,7 @@ function CorrelationMatrix({ matrix }) {
         return <div style={{ color: 'var(--text-tertiary)' }}>No correlation data.</div>;
     }
 
-    // Helper to color cells based on correlation
     const getColor = (value) => {
-        // 1 indicates identity, negative indicates inverse.
         if (value === 1) return 'rgba(255, 255, 255, 0.1)';
         if (value > 0.7) return 'rgba(0, 230, 118, 0.4)';
         if (value > 0.3) return 'rgba(0, 230, 118, 0.2)';

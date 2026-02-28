@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { uploadPortfolioImage } from '../api/riskService';
+import { uploadPortfolioImage } from '../api/riskApi';
 
 function PortfolioInput({ holdings, onUpdate }) {
     const [isUploading, setIsUploading] = useState(false);

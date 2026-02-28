@@ -41,7 +41,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography elements */
 h1, h2, h3, h4, h5 {
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -54,7 +53,6 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
-/* Layout Elements */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -85,7 +83,6 @@ h1 {
   }
 }
 
-/* Premium Card Base */
 .glass-card {
   background: var(--bg-card);
   backdrop-filter: blur(12px);
@@ -113,7 +110,6 @@ h1 {
   gap: 8px;
 }
 
-/* Forms & Inputs */
 .label {
   display: block;
   font-size: 0.875rem;
@@ -156,7 +152,6 @@ h1 {
   background: var(--color-accent-hover);
 }
 
-/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -198,7 +193,6 @@ h1 {
   cursor: not-allowed;
 }
 
-/* Holding Item */
 .holding-item {
   display: flex;
   justify-content: space-between;
@@ -220,7 +214,6 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
-/* Metric Cards */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -247,7 +240,6 @@ h1 {
   font-weight: 600;
 }
 
-/* Correlation Table / Matrix */
 .correlation-table {
   width: 100%;
   border-collapse: collapse;
@@ -283,7 +275,6 @@ h1 {
   color: #fff;
 }
 
-/* Badges */
 .badge {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -295,7 +286,6 @@ h1 {
 .badge-success { background: rgba(0, 230, 118, 0.15); color: var(--color-success); border: 1px solid rgba(0, 230, 118, 0.3); }
 .badge-danger { background: rgba(255, 23, 68, 0.15); color: var(--color-danger); border: 1px solid rgba(255, 23, 68, 0.3); }
 
-/* Loaders */
 .loader-spinner {
   width: 20px;
   height: 20px;
