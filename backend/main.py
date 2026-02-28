@@ -2,16 +2,29 @@ from __future__ import annotations
 
 from typing import List
 
-from fastapi import FastAPI, HTTPException
+import os
+import shutil
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.data.fetcher import fetch_price_history, fetch_single_price_series
 from backend.data.preprocessor import build_portfolio_returns, compute_returns, normalize_weights
+# Load .env file manually if python-dotenv is not installed
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#"):
+                key, val = line.split("=", 1)
+                os.environ[key.strip()] = val.strip()
+
 from backend.risk.beta import beta_alpha
 from backend.risk.correlation import correlation_matrix
 from backend.risk.sharpe import sharpe_ratio
 from backend.risk.var import historical_var, monte_carlo_var, parametric_var_cvar
+from backend.data.scraper import extract_text_from_image, parse_ocr_text_to_portfolio
 
 
 class Holding(BaseModel):
@@ -45,6 +58,36 @@ app.add_middleware(
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok"}
+
+
+@app.post("/api/upload")
+async def upload_image(file: UploadFile = File(...)):
+    # Ensure temp directory exists
+    os.makedirs("temp", exist_ok=True)
+    path = f"temp/{file.filename}"
+    
+    try:
+        with open(path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # 1. Extract raw text from image
+        ocr_text = extract_text_from_image(path)
+        
+        # 2. Parse text into structured portfolio JSON using LLM
+        portfolio_data = parse_ocr_text_to_portfolio(ocr_text)
+        
+        return portfolio_data
+        
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Failed to process image: {str(exc)}")
+    finally:
+        # Clean up temp file
+        if os.path.exists(path):
+            os.remove(path)
 
 
 @app.post("/api/analyze")
