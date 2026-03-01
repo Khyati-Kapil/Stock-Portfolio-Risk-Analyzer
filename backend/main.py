@@ -14,12 +14,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.data.fetcher import fetch_price_history, fetch_single_price_series
-from backend.data.preprocessor import build_portfolio_returns, compute_returns, normalize_weights
-from backend.data.scraper import extract_text_from_image, parse_ocr_text_to_portfolio
+from backend.data.preprocessor import (build_portfolio_returns,
+                                       compute_returns, normalize_weights)
+from backend.data.scraper import (extract_text_from_image,
+                                  parse_ocr_text_to_portfolio)
 from backend.risk.beta import beta_alpha
 from backend.risk.correlation import correlation_matrix
 from backend.risk.sharpe import sharpe_ratio
-from backend.risk.var import historical_var, monte_carlo_var, parametric_var_cvar
+from backend.risk.var import (historical_var, monte_carlo_var,
+                              parametric_var_cvar)
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 if load_dotenv is not None:
@@ -63,6 +66,10 @@ class PortfolioRequest(BaseModel):
     seed: int | None = None
 
 
+def _should_add_ns_suffix(benchmark: str) -> bool:
+    return benchmark.strip().upper() in {"^NSEI", "^NSEBANK"}
+
+
 app = FastAPI(title="Stock Portfolio Risk Analyzer API", version="1.0.0")
 
 app.add_middleware(
@@ -83,7 +90,9 @@ def health() -> dict:
 async def upload_image(file: UploadFile = File(...)) -> dict:
     content_type = (file.content_type or "").lower().strip()
     if content_type not in ALLOWED_UPLOAD_MIME_TYPES:
-        raise HTTPException(status_code=415, detail="Unsupported file type. Use JPEG, PNG, or WEBP.")
+        raise HTTPException(
+            status_code=415, detail="Unsupported file type. Use JPEG, PNG, or WEBP."
+        )
 
     path: str | None = None
     bytes_written = 0
@@ -112,7 +121,9 @@ async def upload_image(file: UploadFile = File(...)) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Failed to process image: {str(exc)}") from exc
+        raise HTTPException(
+            status_code=400, detail=f"Failed to process image: {str(exc)}"
+        ) from exc
     finally:
         await file.close()
         if path and os.path.exists(path):
@@ -124,12 +135,13 @@ def analyze_portfolio(payload: PortfolioRequest) -> dict:
     try:
         tickers = [item.ticker for item in payload.holdings]
         weights = normalize_weights([item.weight for item in payload.holdings])
+        add_ns_suffix = _should_add_ns_suffix(payload.benchmark)
 
         prices = fetch_price_history(
             tickers=tickers,
             period=payload.period,
             interval=payload.interval,
-            add_ns_suffix=True,
+            add_ns_suffix=add_ns_suffix,
         )
         asset_returns = compute_returns(prices, method="simple")
         portfolio_returns = build_portfolio_returns(asset_returns, weights)
@@ -140,10 +152,14 @@ def analyze_portfolio(payload: PortfolioRequest) -> dict:
             interval=payload.interval,
             add_ns_suffix=False,
         )
-        benchmark_returns = compute_returns(benchmark_prices.to_frame("benchmark"), method="simple").iloc[:, 0]
+        benchmark_returns = compute_returns(
+            benchmark_prices.to_frame("benchmark"), method="simple"
+        ).iloc[:, 0]
 
         h_var = historical_var(portfolio_returns, confidence=payload.confidence)
-        p_var, p_cvar = parametric_var_cvar(portfolio_returns, confidence=payload.confidence)
+        p_var, p_cvar = parametric_var_cvar(
+            portfolio_returns, confidence=payload.confidence
+        )
         mc_var = monte_carlo_var(
             portfolio_returns,
             confidence=payload.confidence,

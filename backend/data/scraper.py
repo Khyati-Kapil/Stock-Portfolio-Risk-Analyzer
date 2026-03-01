@@ -10,6 +10,11 @@ except ImportError:
 
 
 DEFAULT_MIME_TYPE = "image/jpeg"
+TICKER_ALIASES = {
+    "BAJAJHF.NS": "BAJAJHFL.NS",
+    "BAJAJHFN.NS": "BAJAJHFL.NS",
+    "BAJAJFINANCE.NS": "BAJFINANCE.NS",
+}
 
 
 def _openai_client() -> OpenAI:
@@ -32,12 +37,18 @@ def _safe_float(value: Any) -> float:
         return 0.0
 
 
+def _normalize_ticker_symbol(raw_ticker: Any) -> str:
+    ticker = str(raw_ticker or "").strip().upper()
+    if not ticker:
+        return ""
+    return TICKER_ALIASES.get(ticker, ticker)
+
+
 def build_portfolio_payload(portfolio: List[Dict[str, Any]]) -> Dict[str, Any]:
-    tickers: List[str] = []
-    values: List[float] = []
+    entries: List[Dict[str, float | str]] = []
 
     for item in portfolio:
-        ticker = str(item.get("ticker", "")).strip().upper()
+        ticker = _normalize_ticker_symbol(item.get("ticker", ""))
         if not ticker:
             continue
 
@@ -47,16 +58,24 @@ def build_portfolio_payload(portfolio: List[Dict[str, Any]]) -> Dict[str, Any]:
         total_value = _safe_float(item.get("total_value", 0))
         value = computed_value if computed_value > 0 else total_value
 
-        tickers.append(ticker)
-        values.append(value)
+        entries.append({"ticker": ticker, "value": value})
 
-    total_value = sum(values)
-    if tickers and total_value > 0:
+    if not entries:
+        return {
+            "tickers": [],
+            "weights": [],
+            "raw_parsed": portfolio,
+        }
+
+    positive_entries = [entry for entry in entries if float(entry["value"]) > 0]
+    if positive_entries:
+        tickers = [str(entry["ticker"]) for entry in positive_entries]
+        values = [float(entry["value"]) for entry in positive_entries]
+        total_value = sum(values)
         weights = [value / total_value for value in values]
-    elif tickers:
-        weights = [1.0 / len(tickers)] * len(tickers)
     else:
-        weights = []
+        tickers = [str(entry["ticker"]) for entry in entries]
+        weights = [1.0 / len(tickers)] * len(tickers)
 
     return {
         "tickers": tickers,
@@ -160,7 +179,10 @@ OCR TEXT:
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that strictly outputs JSON."},
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that strictly outputs JSON.",
+            },
             {"role": "user", "content": prompt},
         ],
         response_format={"type": "json_object"},

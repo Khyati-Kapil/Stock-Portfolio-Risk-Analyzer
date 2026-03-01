@@ -7,6 +7,7 @@ import TrendSignalPanel from './components/TrendSignalPanel';
 import NewsFeed from './components/NewsFeed';
 import MonteCarloPaths from './components/MonteCarloPaths';
 import { analyzePortfolio } from './api/riskApi';
+import { getErrorMessage } from './utils/errorMessage';
 
 function App() {
   const [holdings, setHoldings] = useState([]);
@@ -38,7 +39,7 @@ function App() {
       setMetricsData(data);
     } catch (err) {
       console.error("Analysis failed:", err);
-      setError(err?.response?.data?.detail || "Failed to analyze portfolio. Please check server.");
+      setError(getErrorMessage(err, "Failed to analyze portfolio. Please check server."));
     } finally {
       setIsAnalyzing(false);
     }

@@ -42,6 +42,18 @@ def test_build_payload_uses_equal_weights_when_values_missing():
     assert payload["weights"] == [0.5, 0.5]
 
 
+def test_build_payload_drops_zero_value_rows_when_any_positive_exists():
+    payload = build_portfolio_payload(
+        [
+            {"ticker": "SBIN.NS", "quantity": 0, "average_price": 0},
+            {"ticker": "AXISBANK.NS", "quantity": 2, "average_price": 100},
+        ]
+    )
+
+    assert payload["tickers"] == ["AXISBANK.NS"]
+    assert payload["weights"] == [1.0]
+
+
 def test_build_payload_skips_empty_tickers():
     payload = build_portfolio_payload(
         [

@@ -10,7 +10,9 @@ def beta_alpha(
     risk_free_rate: float = 0.065,
     periods_per_year: int = 252,
 ) -> dict:
-    aligned = pd.concat([portfolio_returns, benchmark_returns], axis=1).dropna(how="any")
+    aligned = pd.concat([portfolio_returns, benchmark_returns], axis=1).dropna(
+        how="any"
+    )
     if aligned.empty:
         raise ValueError("No overlapping portfolio/benchmark returns")
 

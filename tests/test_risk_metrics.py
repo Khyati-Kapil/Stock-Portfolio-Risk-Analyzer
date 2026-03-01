@@ -4,7 +4,8 @@ import pandas as pd
 from backend.risk.beta import beta_alpha
 from backend.risk.correlation import correlation_matrix
 from backend.risk.sharpe import sharpe_ratio
-from backend.risk.var import historical_var, monte_carlo_var, parametric_var_cvar
+from backend.risk.var import (historical_var, monte_carlo_var,
+                              parametric_var_cvar)
 
 
 def _sample_returns(n=300, seed=7):

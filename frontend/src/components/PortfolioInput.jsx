@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { uploadPortfolioImage } from '../api/riskApi';
+import { getErrorMessage } from '../utils/errorMessage';
 
 function PortfolioInput({ holdings, onUpdate }) {
     const [isUploading, setIsUploading] = useState(false);
@@ -17,7 +18,7 @@ function PortfolioInput({ holdings, onUpdate }) {
             onUpdate(data);
         } catch (err) {
             console.error(err);
-            setError(err?.response?.data?.detail || "OCR parsing failed.");
+            setError(getErrorMessage(err, "OCR parsing failed."));
         } finally {
             setIsUploading(false);
         }

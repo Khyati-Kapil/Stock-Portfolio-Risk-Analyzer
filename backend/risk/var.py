@@ -27,7 +27,9 @@ def historical_cvar(returns: pd.Series, confidence: float = 0.95) -> float:
     return max(0.0, float(-tail.mean()))
 
 
-def parametric_var_cvar(returns: pd.Series, confidence: float = 0.95) -> Tuple[float, float]:
+def parametric_var_cvar(
+    returns: pd.Series, confidence: float = 0.95
+) -> Tuple[float, float]:
     if returns.empty:
         raise ValueError("Returns series is empty")
 

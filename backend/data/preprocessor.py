@@ -33,7 +33,9 @@ def compute_returns(prices: pd.DataFrame, method: str = "simple") -> pd.DataFram
     return rets
 
 
-def build_portfolio_returns(asset_returns: pd.DataFrame, weights: Iterable[float]) -> pd.Series:
+def build_portfolio_returns(
+    asset_returns: pd.DataFrame, weights: Iterable[float]
+) -> pd.Series:
     w = normalize_weights(weights)
     if asset_returns.shape[1] != w.size:
         raise ValueError("Number of weights must match number of assets")
@@ -49,7 +51,9 @@ def align_return_series(
     portfolio_returns: pd.Series,
     benchmark_returns: pd.Series,
 ) -> Tuple[pd.Series, pd.Series]:
-    aligned = pd.concat([portfolio_returns, benchmark_returns], axis=1).dropna(how="any")
+    aligned = pd.concat([portfolio_returns, benchmark_returns], axis=1).dropna(
+        how="any"
+    )
     if aligned.empty:
         raise ValueError("Portfolio and benchmark returns do not overlap")
     return aligned.iloc[:, 0], aligned.iloc[:, 1]
@@ -60,6 +64,8 @@ def annualized_return(daily_returns: pd.Series, periods_per_year: int = 252) -> 
     return (1 + mu) ** periods_per_year - 1
 
 
-def annualized_volatility(daily_returns: pd.Series, periods_per_year: int = 252) -> float:
+def annualized_volatility(
+    daily_returns: pd.Series, periods_per_year: int = 252
+) -> float:
     sigma = float(daily_returns.std(ddof=1))
     return sigma * np.sqrt(periods_per_year)
