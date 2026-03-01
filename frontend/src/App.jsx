@@ -15,11 +15,19 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleHoldingsUpdate = (parsedHoldings) => {
-    if (parsedHoldings && parsedHoldings.tickers && parsedHoldings.weights) {
-      const combined = parsedHoldings.tickers.map((ticker, i) => ({
-        ticker: ticker,
-        weight: parsedHoldings.weights[i]
+  const handleHoldingsUpdate = (payload) => {
+    if (!payload) return;
+
+    if (Array.isArray(payload)) {
+      setHoldings(payload);
+      setMetricsData(null);
+      return;
+    }
+
+    if (payload.tickers && payload.weights) {
+      const combined = payload.tickers.map((ticker, i) => ({
+        ticker,
+        weight: payload.weights[i],
       }));
       setHoldings(combined);
       setMetricsData(null);

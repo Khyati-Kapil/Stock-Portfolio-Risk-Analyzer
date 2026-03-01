@@ -204,6 +204,68 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
+.manual-section {
+  margin-bottom: 1rem;
+}
+
+.manual-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.manual-header h4,
+.upload-section h4 {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.holding-edit-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.holding-edit-row .input-field {
+  margin-bottom: 0.6rem;
+}
+
+.holding-edit-row .btn {
+  margin-bottom: 0.6rem;
+  width: auto;
+  padding: 0.7rem 0.9rem;
+}
+
+.manual-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 0.35rem;
+}
+
+.upload-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-light);
+}
+
+@media (max-width: 768px) {
+  .holding-edit-row {
+    grid-template-columns: 1fr;
+  }
+
+  .holding-edit-row .btn {
+    width: 100%;
+  }
+
+  .manual-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .holding-ticker {
   font-weight: 600;
   font-size: 0.95rem;
