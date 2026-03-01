@@ -1,3 +1,11 @@
+#Links
+
+- PPT link - <https://www.canva.com/design/DAHCrmViys4/sqxSRCeT0cATBMzkgpFnRg/edit?utm_content=DAHCrmViys4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton>
+- Demo Video Link - <https://drive.google.com/file/d/1Ika3hdXuy1KHAdiCgLfTkNc4JH2J_xt7/view?usp=sharing>
+
+
+
+
 # Stock Portfolio Risk Analyzer
 
 Full-stack portfolio risk analytics app with screenshot-to-holdings OCR, advanced charting, Gemini narrative insights, and Google OAuth authentication.
@@ -204,5 +212,3 @@ curl -X POST 'http://127.0.0.1:8088/api/analyze' \
 - Gemini AI narrative summary
 - Google OAuth login + protected app route
 
-
-- Demo Video Link - <https://drive.google.com/file/d/1Ika3hdXuy1KHAdiCgLfTkNc4JH2J_xt7/view?usp=sharing>
