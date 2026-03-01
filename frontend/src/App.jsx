@@ -6,6 +6,8 @@ import CorrelationMatrix from './components/CorrelationMatrix';
 import TrendSignalPanel from './components/TrendSignalPanel';
 import NewsFeed from './components/NewsFeed';
 import MonteCarloPaths from './components/MonteCarloPaths';
+import BeginnerInsights from './components/BeginnerInsights';
+import RiskCharts from './components/RiskCharts';
 import { analyzePortfolio } from './api/riskApi';
 import { getErrorMessage } from './utils/errorMessage';
 
@@ -43,7 +45,32 @@ function App() {
     setIsAnalyzing(true);
     setError(null);
     try {
-      const data = await analyzePortfolio(holdings);
+      const sanitizedHoldings = holdings
+        .map((item) => ({
+          ticker: String(item.ticker || '').trim().toUpperCase(),
+          weight: Number(item.weight),
+        }))
+        .filter((item) => item.ticker && Number.isFinite(item.weight) && item.weight > 0);
+
+      if (sanitizedHoldings.length === 0) {
+        setError('No valid holdings found. Please check ticker and weight values.');
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const payload = {
+        holdings: sanitizedHoldings,
+        benchmark: '^NSEI',
+        period: '1y',
+        interval: '1d',
+        confidence: 0.95,
+        risk_free_rate: 0.065,
+        horizon_days: 10,
+        simulations: 3000,
+        seed: 42,
+      };
+
+      const data = await analyzePortfolio(payload);
       setMetricsData(data);
     } catch (err) {
       console.error("Analysis failed:", err);
@@ -89,6 +116,13 @@ function App() {
           {metricsData ? (
             <>
               <RiskMetricCard metrics={metricsData.metrics} />
+
+              <RiskCharts metrics={metricsData.metrics} holdings={holdings} />
+
+              <BeginnerInsights
+                metrics={metricsData.metrics}
+                correlationMatrix={metricsData.correlation_matrix}
+              />
 
               <div className="glass-card" style={{ marginTop: '1.5rem' }}>
                 <h3 className="card-title">Correlation Matrix</h3>
