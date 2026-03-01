@@ -203,3 +203,6 @@ curl -X POST 'http://127.0.0.1:8088/api/analyze' \
   - Heatmap by holdings
 - Gemini AI narrative summary
 - Google OAuth login + protected app route
+
+
+- Demo Video Link - <https://drive.google.com/file/d/1Ika3hdXuy1KHAdiCgLfTkNc4JH2J_xt7/view?usp=sharing>
