@@ -54,7 +54,6 @@ export function AuthProvider({ children }) {
     try {
       await logoutSession();
     } catch (_err) {
-      // no-op
     } finally {
       localStorage.removeItem(TOKEN_KEY);
       setToken(null);

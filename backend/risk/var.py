@@ -72,8 +72,6 @@ def monte_carlo_var(
     if return_paths:
         cumulative_paths = (1 + draws).cumprod(axis=1) - 1
         path_returns = cumulative_paths[:, -1]
-        
-        # Select subset of paths for UI visualization to avoid large payloads
         sample_indices = rng.choice(n_sims, size=min(100, n_sims), replace=False)
         paths_export = cumulative_paths[sample_indices].tolist()
     else:

@@ -108,7 +108,10 @@ function AnalyzerPage() {
     <div className="app-container">
       <header className="dashboard-header">
         <div>
-          <h1>Portfolio Risk Analyzer</h1>
+          <h1>Bulls&Bears</h1>
+          <div style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginTop: '4px' }}>
+            Portfolio Risk Intelligence
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {user && (
@@ -137,7 +140,7 @@ function AnalyzerPage() {
             disabled={isAnalyzing || holdings.length === 0}
             style={{ marginTop: '1.5rem' }}
           >
-            {isAnalyzing ? <span className="loader-spinner"></span> : 'Analyze Risk'}
+            {isAnalyzing ? <span className="loader-spinner"></span> : 'Run Bulls&Bears Analysis'}
           </button>
 
           {error && <div className="error-text">{error}</div>}

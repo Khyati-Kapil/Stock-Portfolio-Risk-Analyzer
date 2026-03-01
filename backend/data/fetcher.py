@@ -23,8 +23,6 @@ def normalize_tickers(tickers: Iterable[str], add_ns_suffix: bool = True) -> Lis
             continue
         if add_ns_suffix and "." not in tk and not tk.startswith("^"):
             tk = f"{tk}.NS"
-
-        # apply global ticker aliases
         tk = TICKER_ALIASES.get(tk, tk)
 
         normalized.append(tk)

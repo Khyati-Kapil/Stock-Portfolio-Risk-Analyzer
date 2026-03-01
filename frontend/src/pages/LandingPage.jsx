@@ -32,10 +32,10 @@ function LandingPage() {
       <div className={styles.content}>
         <section className={styles.hero}>
           <div>
-            <span className={styles.badge}>Portfolio Intelligence</span>
-            <h1 className={styles.title}>Know Your Risk. Own Your Portfolio.</h1>
+            <span className={styles.badge}>Bulls&Bears</span>
+            <h1 className={styles.title}>Know Your Risk. Trade with Conviction.</h1>
             <p className={styles.subtitle}>
-              Upload holdings, quantify downside, and get AI-backed risk interpretation before the market does it for you.
+              Bulls&Bears helps you upload holdings, quantify downside, and get AI-backed risk interpretation before the market moves.
             </p>
             <button className={styles.googleBtn} onClick={login} disabled={isLoading}>
               <GoogleIcon />
@@ -44,7 +44,7 @@ function LandingPage() {
           </div>
 
           <aside className={styles.heroCard}>
-            <h3>Today’s Risk Brief</h3>
+            <h3>Bulls&Bears Daily Brief</h3>
             <p>
               Real-time VaR, correlation stress, drawdown behavior, and personalized narrative analysis in one workflow.
             </p>

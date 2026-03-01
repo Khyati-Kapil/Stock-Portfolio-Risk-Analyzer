@@ -123,6 +123,47 @@ npm run build
 lsof -t -iTCP:8088 -sTCP:LISTEN | xargs -n 1 kill
 ```
 
+## 5) Deploy on Render
+
+This repo includes [`render.yaml`](/Users/atharvpaharia100/Desktop/Projects/Overclock/Stock-Portfolio-Risk-Analyzer/render.yaml) for blueprint deploy.
+
+### Render deploy steps
+
+1. Push `main` to GitHub.
+2. In Render: `New` -> `Blueprint` -> select this repo.
+3. Render will create:
+   - `bulls-bears-api` (FastAPI web service)
+   - `bulls-bears-web` (React static site)
+4. Set secret env vars in Render:
+   - `OPENAI_API_KEY`
+   - `GEMINI_API_KEY`
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+   - `JWT_SECRET`
+   - `GOOGLE_REDIRECT_URI`
+   - `FRONTEND_OAUTH_CALLBACK`
+   - `CORS_ALLOW_ORIGINS`
+   - `REACT_APP_API_BASE_URL`
+
+### Required production URL mapping
+
+- `REACT_APP_API_BASE_URL`:
+  - `https://<your-api-service>.onrender.com/api`
+- `GOOGLE_REDIRECT_URI`:
+  - `https://<your-api-service>.onrender.com/api/auth/callback`
+- `FRONTEND_OAUTH_CALLBACK`:
+  - `https://<your-web-service>.onrender.com/auth/callback`
+- `CORS_ALLOW_ORIGINS`:
+  - `https://<your-web-service>.onrender.com`
+
+### Google OAuth Console setup
+
+In Google Cloud OAuth credentials, add:
+- Authorized redirect URI:
+  - `https://<your-api-service>.onrender.com/api/auth/callback`
+- Authorized JavaScript origins:
+  - `https://<your-web-service>.onrender.com`
+
 ## API Endpoints
 
 - `GET /api/health`

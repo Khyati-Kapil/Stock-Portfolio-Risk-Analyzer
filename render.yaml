@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: bulls-bears-api
+    env: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_OAUTH_CALLBACK
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ALLOW_ORIGINS
+        sync: false
+      - key: MAX_UPLOAD_BYTES
+        value: "5242880"
+
+  - type: web
+    name: bulls-bears-web
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: NODE_VERSION
+        value: 18.20.8
+      - key: REACT_APP_API_BASE_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
