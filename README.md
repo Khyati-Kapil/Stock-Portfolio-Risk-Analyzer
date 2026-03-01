@@ -60,12 +60,17 @@ FRONTEND_OAUTH_CALLBACK=http://localhost:3000/auth/callback
 JWT_SECRET=your_random_secret
 CORS_ALLOW_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 MAX_UPLOAD_BYTES=5242880
-REACT_APP_API_BASE_URL=http://127.0.0.1:8088/api
 ```
 
 Notes:
 - `GOOGLE_REDIRECT_URI` must match your Google Cloud OAuth redirect URI.
 - `FRONTEND_OAUTH_CALLBACK` should match your frontend callback route.
+
+Create `frontend/.env`:
+
+```env
+REACT_APP_API_BASE_URL=http://127.0.0.1:8088/api
+```
 
 ## 3) Run the App
 
