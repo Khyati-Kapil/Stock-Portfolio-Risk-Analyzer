@@ -34,8 +34,10 @@ describe('riskApi', () => {
 
     expect(mockPost.mock.calls[0][0]).toBe('/upload');
     expect(mockPost.mock.calls[0][1]).toBeInstanceOf(FormData);
-    expect(mockPost.mock.calls[0][2]).toEqual({
+    expect(mockPost.mock.calls[0][2]).toMatchObject({
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 300000,
+      maxBodyLength: Infinity,
     });
     expect(result).toEqual({ tickers: ['TCS.NS'] });
   });

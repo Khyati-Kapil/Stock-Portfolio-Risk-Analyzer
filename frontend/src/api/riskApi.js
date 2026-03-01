@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const rawBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/api';
+const rawBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8088/api';
 const baseURL = rawBaseUrl.replace(/\/+$/, '');
 
 export const API_BASE_URL = baseURL;
@@ -28,5 +28,17 @@ export async function uploadPortfolioImage(file) {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
+  return response.data;
+}
+
+export async function getCurrentUser(token) {
+  const response = await riskApi.get('/auth/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}
+
+export async function logoutSession() {
+  const response = await riskApi.get('/auth/logout');
   return response.data;
 }

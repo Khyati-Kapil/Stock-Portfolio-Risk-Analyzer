@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Tuple
+from typing import Dict, Iterable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -69,3 +69,55 @@ def annualized_volatility(
 ) -> float:
     sigma = float(daily_returns.std(ddof=1))
     return sigma * np.sqrt(periods_per_year)
+
+
+def _series_to_dict(series: pd.Series, rounding: int = 8) -> Dict[str, float]:
+    clean = series.dropna()
+    return {
+        idx.strftime("%Y-%m-%d"): round(float(value), rounding)
+        for idx, value in clean.items()
+    }
+
+
+def cumulative_return_series(returns: pd.Series) -> pd.Series:
+    if returns.empty:
+        raise ValueError("Returns series is empty")
+    return (1 + returns).cumprod() - 1
+
+
+def drawdown_series(returns: pd.Series) -> pd.Series:
+    if returns.empty:
+        raise ValueError("Returns series is empty")
+    equity_curve = (1 + returns).cumprod()
+    running_peak = equity_curve.cummax()
+    drawdown = (equity_curve / running_peak) - 1
+    drawdown.name = "drawdown"
+    return drawdown
+
+
+def rolling_annualized_volatility(
+    returns: pd.Series, window: int = 30, periods_per_year: int = 252
+) -> pd.Series:
+    if returns.empty:
+        raise ValueError("Returns series is empty")
+    rolling_vol = returns.rolling(window=window).std(ddof=1) * np.sqrt(periods_per_year)
+    rolling_vol.name = f"rolling_vol_{window}"
+    return rolling_vol
+
+
+def build_advanced_series_payload(
+    portfolio_returns: pd.Series,
+    benchmark_returns: pd.Series,
+    window: int = 30,
+) -> Dict[str, Dict[str, float]]:
+    portfolio_aligned, benchmark_aligned = align_return_series(
+        portfolio_returns, benchmark_returns
+    )
+    return {
+        "daily_returns": _series_to_dict(portfolio_aligned),
+        "benchmark_returns": _series_to_dict(benchmark_aligned),
+        "drawdown_series": _series_to_dict(drawdown_series(portfolio_aligned)),
+        "rolling_volatility": _series_to_dict(
+            rolling_annualized_volatility(portfolio_aligned, window=window)
+        ),
+    }

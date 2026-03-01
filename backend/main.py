@@ -13,8 +13,11 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from backend.ai.gemini_analyzer import generate_portfolio_narrative
+from backend.auth.google_oauth import router as google_auth_router
 from backend.data.fetcher import fetch_price_history, fetch_single_price_series
 from backend.data.preprocessor import (build_portfolio_returns,
+                                       build_advanced_series_payload,
                                        compute_returns, normalize_weights)
 from backend.data.scraper import (extract_text_from_image,
                                   parse_ocr_text_to_portfolio)
@@ -26,7 +29,7 @@ from backend.risk.var import (historical_var, monte_carlo_var,
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 if load_dotenv is not None:
-    load_dotenv(BASE_DIR / ".env")
+    load_dotenv(BASE_DIR / ".env", override=True)
 
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(5 * 1024 * 1024)))
 ALLOWED_UPLOAD_MIME_TYPES = {
@@ -79,6 +82,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(google_auth_router)
 
 
 @app.get("/api/health")
@@ -160,12 +164,13 @@ def analyze_portfolio(payload: PortfolioRequest) -> dict:
         p_var, p_cvar = parametric_var_cvar(
             portfolio_returns, confidence=payload.confidence
         )
-        mc_var = monte_carlo_var(
+        mc_var, mc_paths = monte_carlo_var(
             portfolio_returns,
             confidence=payload.confidence,
             n_sims=payload.simulations,
             horizon_days=payload.horizon_days,
             seed=payload.seed,
+            return_paths=True,
         )
         sharpe = sharpe_ratio(portfolio_returns, risk_free_rate=payload.risk_free_rate)
         beta_info = beta_alpha(
@@ -174,6 +179,30 @@ def analyze_portfolio(payload: PortfolioRequest) -> dict:
             risk_free_rate=payload.risk_free_rate,
         )
         corr = correlation_matrix(asset_returns)
+        advanced_series = build_advanced_series_payload(
+            portfolio_returns=portfolio_returns,
+            benchmark_returns=benchmark_returns,
+            window=30,
+        )
+        try:
+            narrative = generate_portfolio_narrative(
+                metrics={
+                    "historical_var": h_var,
+                    "parametric_var": p_var,
+                    "parametric_cvar": p_cvar,
+                    "monte_carlo_var": mc_var,
+                    "sharpe_ratio": sharpe,
+                    "beta": beta_info["beta"],
+                    "alpha_annual": beta_info["alpha_annual"],
+                    "r_squared": beta_info["r_squared"],
+                    "observations": beta_info["observations"],
+                },
+                holdings=[item.model_dump() for item in payload.holdings],
+                correlation_matrix=corr.round(4).to_dict(),
+            )
+        except Exception as e:
+            print("GEMINI ERROR:", e)
+            narrative = f"AI narrative unavailable: {str(e)}"
 
         return {
             "metrics": {
@@ -188,6 +217,12 @@ def analyze_portfolio(payload: PortfolioRequest) -> dict:
                 "observations": beta_info["observations"],
             },
             "correlation_matrix": corr.round(4).to_dict(),
+            "daily_returns": advanced_series["daily_returns"],
+            "benchmark_returns": advanced_series["benchmark_returns"],
+            "drawdown_series": advanced_series["drawdown_series"],
+            "rolling_volatility": advanced_series["rolling_volatility"],
+            "gemini_narrative": narrative,
+            "monte_carlo_paths": mc_paths,
         }
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

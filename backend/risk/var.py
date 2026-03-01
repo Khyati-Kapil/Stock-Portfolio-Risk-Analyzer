@@ -54,7 +54,8 @@ def monte_carlo_var(
     n_sims: int = 10000,
     horizon_days: int = 1,
     seed: int | None = None,
-) -> float:
+    return_paths: bool = False,
+) -> float | Tuple[float, list[list[float]]]:
     if returns.empty:
         raise ValueError("Returns series is empty")
     if n_sims <= 0:
@@ -67,6 +68,21 @@ def monte_carlo_var(
     sigma = float(returns.std(ddof=1))
 
     draws = rng.normal(loc=mu, scale=sigma, size=(n_sims, horizon_days))
-    path_returns = (1 + draws).prod(axis=1) - 1
+    
+    if return_paths:
+        cumulative_paths = (1 + draws).cumprod(axis=1) - 1
+        path_returns = cumulative_paths[:, -1]
+        
+        # Select subset of paths for UI visualization to avoid large payloads
+        sample_indices = rng.choice(n_sims, size=min(100, n_sims), replace=False)
+        paths_export = cumulative_paths[sample_indices].tolist()
+    else:
+        path_returns = (1 + draws).prod(axis=1) - 1
+        paths_export = []
+
     q = np.percentile(path_returns, (1 - confidence) * 100)
-    return max(0.0, float(-q))
+    var_result = max(0.0, float(-q))
+    
+    if return_paths:
+        return var_result, paths_export
+    return var_result

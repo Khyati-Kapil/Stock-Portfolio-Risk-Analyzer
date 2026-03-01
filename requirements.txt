@@ -10,3 +10,6 @@ httpx
 python-multipart
 openai
 python-dotenv
+google-generativeai
+authlib
+python-jose[cryptography]
